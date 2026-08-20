@@ -1,0 +1,9 @@
+{
+  "name": "Falcon by Flam",
+  "short_name": "Falcon",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0704",
+  "theme_color": "#0d0704",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

@@ -1,0 +1,1002 @@
+.benchmarks-page {
+  /* Type and structure follow flamapp.ai/models/falcon — Golos Text, opacity
+     tiers, large radii — but the palette stays the product's warm bronze. The
+     ground and the ambient glow carry the colour; data is never colour-coded. */
+  --bench-bg: #0d0704;
+  --bench-panel: rgb(24 15 9 / 58%);
+  --bench-ink: #fbf5ee;
+  --bench-copy: rgb(251 245 238 / 74%);
+  --bench-subtle: rgb(251 245 238 / 56%);
+  --bench-muted: rgb(251 245 238 / 38%);
+  --bench-accent: #e8a765;
+  --bench-accent-soft: #f0c9a0;
+  --bench-accent-bright: #ffe2bd;
+  --bench-line: rgb(255 234 219 / 9%);
+  --bench-line-strong: rgb(232 167 101 / 30%);
+  --font-page: 'Golos Text', var(--font-sans);
+
+  /* Presentation scale. Every size the audience has to read at a distance is
+     tokenised here and stepped up in the min-width tiers at the end of this
+     file, so the page can be tuned for a projector in one place. */
+  --bench-max: 1060px;
+  --bench-hero-max: 900px;
+  --bench-gap: 26px;
+  --bench-radius: 22px;
+  --t-hero-tagline: clamp(15px, 1.8vw, 18px);
+  --t-hero-intro: 13.5px;
+  --t-metric: 30px;
+  --t-metric-label: 11.5px;
+  --t-metric-detail: 11px;
+  --t-card-title: 15px;
+  --t-card-meta: 10px;
+  --t-thead: 10.5px;
+  --t-row-label: 12.5px;
+  --t-row-sub: 10.5px;
+  --t-cell: 12px;
+  --t-note: 11px;
+  --t-scope-label: 10.5px;
+  --t-scope: 12px;
+  --t-method: 11px;
+  --hero-measure: 860px;
+  --cell-pad-y: 10px;
+  --cell-pad-x: 8px;
+  --card-pad-x: 24px;
+  --rowlabel-w: 210px;
+  --rule: rgb(255 234 219 / 8%);
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  overflow-x: clip;
+  color: var(--bench-copy);
+  /* No background of its own: the root layout's body colour and site-wide
+     particle layer are the page's backdrop, same as the rest of the site. */
+  font-family: var(--font-page);
+  letter-spacing: -.02em;
+}
+
+.benchmarks-page *,
+.benchmarks-page *::before,
+.benchmarks-page *::after {
+  box-sizing: border-box;
+}
+
+/* The report stands on the plain dark ground alone: no stars behind data.
+   Hiding the root layout's site-wide particle canvas here (rather than
+   removing it from the layout) keeps it on every other page, and display:none
+   also parks its draw loop — the component pauses when not intersecting. */
+body:has(.benchmarks-page) > .stage-particles {
+  display: none;
+}
+
+.benchmarks-page main {
+  width: 100%;
+  outline: none;
+}
+
+.benchmarks-hero {
+  display: flex;
+  width: min(var(--bench-hero-max), calc(100% - 40px));
+  margin: clamp(34px, 6svh, 60px) auto 0;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  animation: benchmark-enter 700ms cubic-bezier(.2, .7, .2, 1) 80ms both;
+}
+
+.benchmarks-report-pill {
+  display: inline-flex;
+  min-height: 29px;
+  align-items: center;
+  padding: 5px 14px;
+  border: 1px solid var(--bench-line-strong);
+  border-radius: 999px;
+  color: var(--bench-accent-soft);
+  background: rgb(232 167 101 / 9%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .01em;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 3%);
+}
+
+.benchmarks-hero h1 {
+  margin: 16px 0 0;
+  color: #f3ddc9;
+  font-family: var(--font-page);
+  font-size: clamp(44px, 8vw, 84px);
+  font-weight: 500;
+  letter-spacing: -.04em;
+  line-height: 1;
+  background: linear-gradient(83deg, #fdfbf5 1%, #dcb7ad 99%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.benchmarks-hero__tagline {
+  margin: 16px 0 0;
+  color: #f0e2d0;
+  font-size: var(--t-hero-tagline);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  text-shadow: 0 1px 10px rgb(13 7 4 / 50%);
+}
+
+/* Narrower measure and more leading: at 80ch this ran as a centred slab that
+   nobody reads from a stage. ~58ch gives it a shape. */
+.benchmarks-hero__intro {
+  max-width: min(var(--hero-measure), 100%);
+  margin: 18px 0 0;
+  color: var(--bench-copy);
+  font-size: var(--t-hero-intro);
+  letter-spacing: -.1px;
+  line-height: 1.68;
+  text-wrap: balance;
+}
+
+.benchmarks-hero__intro strong {
+  color: var(--bench-accent-bright);
+  font-weight: 500;
+}
+
+/* The closing clause was a list written as prose — pinned pipeline, greedy
+   decoding, fixed seeds, audit trail. Set as chips it scans in one pass instead
+   of trailing off the end of a paragraph. */
+.benchmarks-hero__method {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  /* Same measure as the paragraph above, so the two blocks share one edge.
+     The hero centres its children, so without width:100% this row would shrink
+     to its content and sit a couple of pixels inside the paragraph. */
+  width: 100%;
+  max-width: min(var(--hero-measure), 100%);
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.benchmarks-hero__method li {
+  padding: 6px 14px;
+  border: 1px solid rgb(255 234 219 / 15%);
+  border-radius: 999px;
+  background: rgb(255 234 219 / 5%);
+  color: var(--bench-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--t-method);
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+.benchmark-artifact-note {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  width: min(760px, 100%);
+  margin-top: 18px;
+  padding: 12px 15px;
+  border: 1px solid var(--bench-line-strong);
+  border-radius: 14px;
+  background: rgb(10 6 3 / 64%);
+  text-align: left;
+  backdrop-filter: blur(10px);
+}
+
+.benchmark-artifact-note > span {
+  align-self: start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--bench-bg);
+  background: var(--bench-accent-bright);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.benchmark-artifact-note p {
+  margin: 0;
+  color: #b8a897;
+  font-size: 11.5px;
+  line-height: 1.62;
+}
+
+.benchmark-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  width: min(var(--bench-max), calc(100% - 40px));
+  margin: 30px auto 0;
+  overflow: hidden;
+  border: 1px solid var(--bench-line);
+  border-radius: var(--bench-radius);
+  background: rgb(255 234 219 / 12%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 242 232 / 22%),
+    0 32px 70px -34px rgb(0 0 0 / 78%);
+  backdrop-filter: blur(30px) saturate(155%);
+  -webkit-backdrop-filter: blur(30px) saturate(155%);
+  animation: benchmark-enter 700ms cubic-bezier(.2, .7, .2, 1) 160ms both;
+}
+
+.benchmark-metrics > div {
+  min-width: 0;
+  padding: 20px 22px;
+  background: linear-gradient(157deg, rgb(255 236 220 / 7%) 0%, rgb(20 12 7 / 46%) 70%);
+}
+
+.benchmark-metrics strong {
+  display: block;
+  color: var(--bench-accent-bright);
+  font-family: var(--font-page);
+  font-size: var(--t-metric);
+  font-weight: 500;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.benchmark-metrics h2 {
+  margin: 5px 0 0;
+  color: var(--bench-ink);
+  font-size: var(--t-metric-label);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.benchmark-metrics p {
+  margin: 3px 0 0;
+  /* These sit over the brightest glass on the page, where the muted tier loses
+     too much contrast to survive a projector. */
+  color: var(--bench-subtle);
+  font-size: var(--t-metric-detail);
+  line-height: 1.5;
+}
+
+.benchmark-tables,
+.benchmark-section {
+  width: min(var(--bench-max), calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.benchmark-tables > .reveal,
+.benchmark-section {
+  margin-top: var(--bench-gap);
+}
+
+.benchmark-table-card,
+.benchmark-plot-card {
+  overflow: hidden;
+  border: 1px solid rgb(255 234 219 / 13%);
+  border-radius: var(--bench-radius);
+  /* Frosted glass: a translucent surface that grades from a lit top-left edge
+     into shadow, over a blurred and slightly over-saturated sample of the warm
+     field behind it. The pools in that field are deliberately tight so the blur
+     has real structure to diffuse — over a flat wash this would read as nothing. */
+  background: linear-gradient(
+    157deg,
+    rgb(255 236 220 / 9%) 0%,
+    rgb(255 226 205 / 3%) 26%,
+    rgb(22 13 8 / 34%) 62%,
+    rgb(16 9 5 / 46%) 100%
+  );
+  backdrop-filter: blur(30px) saturate(155%);
+  -webkit-backdrop-filter: blur(30px) saturate(155%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 242 232 / 22%),
+    inset 0 -1px 0 rgb(0 0 0 / 30%),
+    0 32px 70px -34px rgb(0 0 0 / 78%);
+}
+
+/* Specular sweep across the top of the pane — the highlight that reads as a
+   sheet of glass catching light rather than a flat translucent rectangle. */
+.benchmark-table-card::after,
+.benchmark-plot-card::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto;
+  height: 62%;
+  /* Top corners only. `border-radius: inherit` also rounded the bottom two,
+     which sat mid-card and drew a second rounded panel inside the table. */
+  border-radius: var(--bench-radius) var(--bench-radius) 0 0;
+  background: linear-gradient(
+    104deg,
+    rgb(255 240 228 / 10%) 0%,
+    rgb(255 240 228 / 3%) 22%,
+    transparent 52%
+  );
+  /* And dissolve downward, so the sheen has no bottom edge to read as a seam. */
+  mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 45%) 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 45%) 55%, transparent 100%);
+  pointer-events: none;
+}
+
+.benchmark-table-card,
+.benchmark-plot-card {
+  transition: border-color 250ms ease, box-shadow 300ms ease, transform 280ms cubic-bezier(.2, .7, .2, 1);
+}
+
+.benchmark-table-card:hover,
+.benchmark-plot-card:hover {
+  border-color: rgb(255 200 150 / 30%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 242 232 / 30%),
+    inset 0 -1px 0 rgb(0 0 0 / 30%),
+    0 38px 80px -34px rgb(0 0 0 / 82%);
+}
+
+.benchmark-card-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 20px var(--card-pad-x) 2px;
+  flex-wrap: wrap;
+}
+
+.benchmark-card-heading h2 {
+  margin: 0;
+  color: var(--bench-ink);
+  font-size: var(--t-card-title);
+  font-weight: 500;
+  letter-spacing: -.035em;
+}
+
+.benchmark-card-heading > span {
+  color: var(--bench-muted);
+  font-family: var(--font-mono);
+  font-size: var(--t-card-meta);
+  text-transform: lowercase;
+}
+
+.benchmark-table-scroll,
+.benchmark-plot-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: rgb(255 255 255 / 18%) transparent;
+  scrollbar-width: thin;
+}
+
+.benchmark-table-scroll:focus-visible,
+.benchmark-plot-scroll:focus-visible {
+  outline: 1px solid var(--bench-accent-soft);
+  outline-offset: -3px;
+}
+
+.benchmark-table-scroll table {
+  width: calc(100% - (var(--card-pad-x) * 2));
+  margin-inline: var(--card-pad-x);
+  border-spacing: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.benchmark-table-scroll th,
+.benchmark-table-scroll td {
+  padding: var(--cell-pad-y) var(--cell-pad-x);
+  border-bottom: 1px solid var(--rule);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.benchmark-table-scroll thead th {
+  padding-block: 12px 9px;
+  color: var(--bench-muted);
+  font-family: var(--font-mono);
+  font-size: var(--t-thead);
+  font-weight: 600;
+  letter-spacing: .4px;
+}
+
+.benchmark-table-scroll thead th:first-child {
+  width: var(--rowlabel-w);
+  color: var(--bench-muted);
+  font-family: var(--font-sans);
+  letter-spacing: .7px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.benchmark-table-scroll tbody tr {
+  transition: background 150ms ease;
+}
+
+.benchmark-table-scroll tbody tr:hover {
+  background: rgb(255 255 255 / 2.2%);
+}
+
+.benchmark-table-scroll tbody th {
+  width: var(--rowlabel-w);
+  color: var(--bench-ink);
+  font-size: var(--t-row-label);
+  font-weight: 620;
+  text-align: left;
+  white-space: normal;
+}
+
+.benchmark-table-scroll tbody th span,
+.benchmark-table-scroll tbody th small {
+  display: block;
+}
+
+.benchmark-table-scroll tbody th small {
+  margin-top: 1px;
+  color: var(--bench-muted);
+  font-size: var(--t-row-sub);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.benchmark-table-scroll td {
+  color: var(--bench-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--t-cell);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* Emphasis is carried by brightness and weight, never by a filled cell. Plain
+   values sit at 58% white; the Falcon column lifts to 80%; the row's best value
+   goes to full white. Falcon winning a row is the brightest state on the page —
+   warm white — and that is as loud as any cell gets. */
+.benchmark-table-scroll .is-falcon {
+  color: var(--bench-accent-soft);
+  font-weight: 500;
+}
+
+.benchmark-table-scroll thead .is-falcon {
+  color: var(--bench-accent-bright);
+  font-weight: 500;
+}
+
+.benchmark-table-scroll .is-best {
+  color: var(--bench-ink);
+  font-weight: 500;
+}
+
+.benchmark-table-scroll td.is-falcon.is-best {
+  color: var(--bench-accent-bright);
+}
+
+.benchmark-table-scroll .is-reported {
+  text-decoration: underline dotted rgb(255 255 255 / 24%);
+  text-underline-offset: 3px;
+}
+
+.benchmark-table-note,
+.benchmark-plot-note {
+  margin: 0;
+  padding: 12px var(--card-pad-x) 18px;
+  color: var(--bench-muted);
+  font-size: var(--t-note);
+  line-height: 1.62;
+}
+
+.benchmark-plot-card {
+  padding: 0;
+}
+
+.benchmark-plot-scroll {
+  padding: 8px 20px 0;
+}
+
+.benchmark-plot-scroll svg {
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+
+.benchmark-plot__axes path:first-child {
+  fill: none;
+  stroke: rgb(255 255 255 / 14%);
+  stroke-width: 1;
+}
+
+.benchmark-plot__axes path:last-child {
+  fill: none;
+  stroke: rgb(255 255 255 / 5%);
+  stroke-width: 1;
+}
+
+.benchmark-plot__labels,
+.benchmark-plot__point,
+.benchmark-plot__falcon {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+}
+
+.benchmark-plot__labels {
+  fill: #8a7663;
+}
+
+.benchmark-plot__axis-title {
+  fill: var(--bench-muted);
+}
+
+.benchmark-plot__frontier {
+  fill: none;
+  stroke: var(--bench-line-strong);
+  stroke-dasharray: 4 4;
+  stroke-width: 1.5;
+}
+
+.benchmark-plot__point {
+  color: var(--bench-subtle);
+  fill: var(--bench-subtle);
+}
+
+.benchmark-plot__point circle {
+  fill: currentColor;
+}
+
+.benchmark-plot__point--reported circle {
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.benchmark-plot__falcon {
+  fill: var(--bench-accent-bright);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.benchmark-plot__falcon circle:not(.benchmark-plot__falcon-halo) {
+  fill: var(--bench-accent-bright);
+}
+
+.benchmark-plot__falcon-halo {
+  fill: rgb(242 193 136 / 24%);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: benchmark-point-pulse 2.8s ease-in-out infinite;
+}
+
+.rag-eval__eyebrow {
+  margin: 0 0 5px;
+  color: var(--bench-accent-soft);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.rag-eval__intro {
+  margin: 8px 0 2px;
+  padding: 0 24px;
+  color: var(--bench-copy);
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.rag-metric-link {
+  color: inherit;
+  text-decoration: underline dotted rgb(240 201 160 / 45%);
+  text-underline-offset: 3px;
+}
+
+.rag-metric-link:hover {
+  color: var(--bench-accent-bright);
+}
+
+.rag-metric-list {
+  margin: 14px 24px 20px;
+  border-top: 1px solid rgb(255 255 255 / 7%);
+}
+
+.rag-metric {
+  border-bottom: 1px solid rgb(255 255 255 / 5%);
+  scroll-margin-top: 96px;
+}
+
+.rag-metric:last-child {
+  border-bottom: 0;
+}
+
+.rag-metric summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 4px;
+  cursor: pointer;
+  list-style: none;
+  transition: background 150ms ease;
+}
+
+.rag-metric summary::-webkit-details-marker {
+  display: none;
+}
+
+.rag-metric summary:hover {
+  background: rgb(255 255 255 / 2.2%);
+}
+
+.rag-metric summary:focus-visible {
+  outline: 1px solid var(--bench-accent-soft);
+  outline-offset: -2px;
+}
+
+.rag-metric__num {
+  color: #a08f7e;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.rag-metric__name {
+  flex: 1;
+  color: #e8ddd2;
+  font-size: 12.5px;
+  font-weight: 620;
+}
+
+.rag-metric__value {
+  color: var(--bench-accent-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rag-metric__chevron {
+  align-self: center;
+  flex-shrink: 0;
+  color: #a08f7e;
+  transition: transform 200ms ease;
+}
+
+.rag-metric[open] .rag-metric__chevron {
+  transform: rotate(180deg);
+}
+
+.rag-metric__facets {
+  display: flex;
+  margin: 2px 0 0;
+  padding: 2px 4px 16px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rag-metric__facets > div {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.rag-metric__facets dt {
+  color: var(--bench-accent-soft);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.rag-metric__facets dd {
+  margin: 0;
+  color: #b0a294;
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+/* Scope, limits and how the test set was built. This is the section that makes
+   the rest of the report credible, so it is presented as a panel in its own
+   right rather than as dashed-outline fine print, and it scales with the
+   presentation tiers like every other block. The accent rail marks it as the
+   report's own statement about itself. */
+.rag-scope {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--bench-gap);
+  margin-top: var(--bench-gap);
+}
+
+.rag-scope__card {
+  position: relative;
+  padding: 24px 28px;
+  overflow: hidden;
+  border: 1px solid rgb(255 234 219 / 13%);
+  border-radius: var(--bench-radius);
+  background: linear-gradient(
+    157deg,
+    rgb(255 236 220 / 8%) 0%,
+    rgb(255 226 205 / 3%) 26%,
+    rgb(22 13 8 / 32%) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 242 232 / 18%),
+    0 24px 56px -32px rgb(0 0 0 / 72%);
+}
+
+.rag-scope h3 {
+  margin: 0 0 8px;
+  color: var(--bench-accent-soft);
+  font-family: var(--font-mono);
+  font-size: var(--t-scope-label);
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.rag-scope p {
+  margin: 0;
+  color: var(--bench-copy);
+  font-size: var(--t-scope);
+  line-height: 1.66;
+}
+
+.benchmarks-footer {
+  margin-top: 26px;
+  padding: 0 20px 44px;
+  color: #8a7663;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .4px;
+  text-align: center;
+}
+
+@keyframes benchmark-enter {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes benchmark-shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+@keyframes benchmark-point-pulse {
+  0%, 100% { opacity: .6; transform: scale(.86); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
+@media (max-width: 900px) {
+  .benchmark-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .benchmarks-hero,
+  .benchmark-metrics,
+  .benchmark-tables,
+  .benchmark-section {
+    width: min(100% - 28px, 1060px);
+  }
+
+  .benchmarks-hero {
+    margin-top: clamp(42px, 9svh, 72px);
+  }
+
+  .benchmarks-hero h1 {
+    font-size: clamp(48px, 16vw, 70px);
+  }
+
+  .benchmarks-hero__intro {
+    font-size: 13px;
+  }
+
+  .benchmark-artifact-note {
+    grid-template-columns: 1fr;
+  }
+
+  .benchmark-artifact-note > span {
+    justify-self: center;
+  }
+
+  .benchmark-metrics > div {
+    padding: 18px 17px;
+  }
+
+  .benchmark-metrics strong {
+    font-size: 27px;
+  }
+
+  .benchmark-card-heading {
+    padding-inline: 18px;
+  }
+
+  .benchmark-table-scroll table {
+    width: calc(100% - 36px);
+    margin-inline: 18px;
+  }
+
+  .benchmark-table-note,
+  .benchmark-plot-note {
+    padding-inline: 18px;
+  }
+
+  .benchmark-plot-scroll {
+    padding-inline: 8px;
+  }
+
+  .rag-eval__intro {
+    padding-inline: 18px;
+  }
+
+  .rag-metric-list {
+    margin-inline: 18px;
+  }
+
+  .rag-metric__facets > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .rag-scope {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 430px) {
+  .benchmark-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .benchmark-metrics > div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 14px;
+  }
+
+  .benchmark-metrics strong {
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+
+  .benchmark-metrics h2,
+  .benchmark-metrics p {
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .benchmarks-hero,
+  .benchmark-metrics,
+  .benchmarks-hero h1,
+  .benchmark-plot__falcon-halo {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Presentation tiers.
+
+   The report is shown on stage as well as read on a laptop, so above 1280px
+   the page stops being a narrow reading column and becomes a display surface:
+   the container widens, and every size the audience has to resolve from the
+   back of a room steps up together. Only the tokens change here — the layout
+   rules above are untouched.
+   --------------------------------------------------------------------------- */
+
+@media (min-width: 1280px) {
+  .benchmarks-page {
+    --bench-max: 1280px;
+    --bench-hero-max: 1000px;
+    --bench-gap: 34px;
+    --t-hero-intro: 15px;
+    --t-metric: 44px;
+    --t-metric-label: 13.5px;
+    --t-metric-detail: 12.5px;
+    --t-card-title: 19px;
+    --t-card-meta: 11.5px;
+    --t-thead: 12.5px;
+    --t-row-label: 15px;
+    --t-row-sub: 12px;
+    --t-cell: 15px;
+    --t-note: 12.5px;
+    --t-scope-label: 13px;
+    --t-scope: 14px;
+    --t-method: 12.5px;
+    --hero-measure: 950px;
+    --cell-pad-y: 14px;
+    --cell-pad-x: 12px;
+    --card-pad-x: 30px;
+    --rowlabel-w: 250px;
+    --rule: rgb(255 234 219 / 11%);
+  }
+}
+
+@media (min-width: 1600px) {
+  .benchmarks-page {
+    --bench-max: 1520px;
+    --bench-hero-max: 1120px;
+    --bench-gap: 44px;
+    --bench-radius: 26px;
+    --t-hero-tagline: 26px;
+    --t-hero-intro: 17px;
+    --t-metric: 58px;
+    --t-metric-label: 16px;
+    --t-metric-detail: 14px;
+    --t-card-title: 24px;
+    --t-card-meta: 13px;
+    --t-thead: 14.5px;
+    --t-row-label: 18px;
+    --t-row-sub: 13.5px;
+    --t-cell: 19px;
+    --t-note: 14px;
+    --t-scope-label: 14px;
+    --t-scope: 16px;
+    --t-method: 13.5px;
+    --hero-measure: 1010px;
+    --cell-pad-y: 18px;
+    --cell-pad-x: 16px;
+    --card-pad-x: 38px;
+    --rowlabel-w: 310px;
+    --rule: rgb(255 234 219 / 13%);
+  }
+
+  .benchmark-metrics > div { padding: 32px 34px; }
+  .benchmark-card-heading { padding: 30px var(--card-pad-x) 6px; }
+  .benchmarks-hero h1 { font-size: 104px; }
+}
+
+@media (min-width: 2000px) {
+  .benchmarks-page {
+    --bench-max: 1840px;
+    --bench-hero-max: 1240px;
+    --t-hero-tagline: 32px;
+    --t-hero-intro: 19px;
+    --t-metric: 72px;
+    --t-metric-label: 18px;
+    --t-metric-detail: 15.5px;
+    --t-card-title: 29px;
+    --t-thead: 16.5px;
+    --t-row-label: 21px;
+    --t-row-sub: 15px;
+    --t-cell: 23px;
+    --t-note: 15.5px;
+    --t-scope-label: 15px;
+    --t-scope: 17.5px;
+    --t-method: 15px;
+    --hero-measure: 1100px;
+    --cell-pad-y: 22px;
+    --cell-pad-x: 20px;
+    --card-pad-x: 46px;
+    --rowlabel-w: 360px;
+  }
+
+  .benchmarks-hero h1 { font-size: 128px; }
+  .benchmark-metrics > div { padding: 40px 42px; }
+}
+
+/* Distance legibility.
+
+   Projected, the table still has to separate the Falcon column from the rest —
+   but with a hairline band and a brighter value, not a coloured fill. The
+   strongest mark on the page is a 4% white wash and a 1px warm rule. */
+@media (min-width: 1280px) {
+  .benchmark-table-scroll td.is-falcon,
+  .benchmark-table-scroll thead th.is-falcon {
+    background: rgb(232 167 101 / 6%);
+    box-shadow: inset 1px 0 0 var(--bench-line-strong), inset -1px 0 0 var(--bench-line-strong);
+  }
+
+  .benchmark-table-scroll thead th.is-falcon {
+    border-radius: 10px 10px 0 0;
+    box-shadow: inset 1px 0 0 var(--bench-line-strong), inset -1px 0 0 var(--bench-line-strong), inset 0 1px 0 var(--bench-line-strong);
+  }
+
+  /* Close the column: the header rounds the top, so the final row has to round
+     and cap the bottom or the band reads as an open-ended bracket. */
+  .benchmark-table-scroll tbody tr:last-child td.is-falcon {
+    border-bottom-color: transparent;
+    border-radius: 0 0 10px 10px;
+    box-shadow: inset 1px 0 0 var(--bench-line-strong), inset -1px 0 0 var(--bench-line-strong), inset 0 -1px 0 var(--bench-line-strong);
+  }
+
+  .benchmark-table-scroll tbody tr:hover { background: rgb(255 234 219 / 3%); }
+}
+
+/* The plot's type is sized in viewBox units, so it already grows with the
+   container — 9.5 units render at ~24px once the card is 1440px wide. Scaling
+   the font-size here as well would double-count and make the labels collide. */
+
+/* Long competitor names (Mistral-Small-3.2, Llama-4-Scout 109B) no longer fit
+   one line once the header type scales up, so let them wrap instead of
+   overflowing their column. Values stay on one line — they are all short. */
+.benchmark-table-scroll thead th {
+  white-space: normal;
+  line-height: 1.25;
+  vertical-align: bottom;
+}

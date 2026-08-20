@@ -1,0 +1,781 @@
+/* Dark-locked by design: the visual direction has no light treatment, so
+   `color-scheme: dark` (plus the matching meta in index.html) keeps browser
+   chrome, form controls and scrollbars dark whatever the OS asks for. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0705;
+  --bg-deep: #060403;
+  --panel: #090604;
+  --panel-raised: #171009;
+  --panel-warm: #120b06;
+  --ink: #fbf7f2;
+  --text: #ded5cb;
+  --text-subtle: #bdae9f;
+  --text-muted: #9c8b79;
+  --primary: #e8a765;
+  --primary-soft: #f2d5c3;
+  --primary-bright: #fdf1e2;
+  --primary-faint: rgba(232, 167, 101, 0.12);
+  --primary-border: rgba(232, 167, 101, 0.38);
+  --border: rgba(255, 255, 255, 0.13);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  /* The rim that draws every capsule and the stage card in the new direction:
+     borders define surfaces here, shadows only lift them. */
+  --border-bright: rgba(255, 255, 255, 0.2);
+  --success: #2dd4bf;
+  --warning: #facc15;
+  --danger: #f87171;
+  --blue: #93c5fd;
+  --font-sans: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Zalando Sans', 'Geist Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Geist Mono', 'SFMono-Regular', Consolas, monospace;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.46);
+  --shadow-stage: 0 44px 120px rgba(0, 0, 0, 0.66);
+  --radius-stage: 32px;
+  --radius-card: 24px;
+  --radius-panel: 18px;
+  /* The iridescent sphere: the hero glyph, the assistant avatar and the orb's
+     no-WebGL fallback are all the same marble. */
+  /* Recolored to match the live orb (voice-orb.css): apricot shoulder top-left,
+     rust pools opposite, copper body — the same three hues, laid out the same
+     way, so the avatar beside a reply reads as a small version of the marble
+     rather than a different object. */
+  --orb-sheen:
+    radial-gradient(circle at 30% 20%, rgba(255, 246, 235, 0.9), transparent 30%),
+    radial-gradient(circle at 24% 18%, #f8d3a6, transparent 58%),
+    radial-gradient(circle at 74% 34%, #9d3d22, transparent 62%),
+    radial-gradient(circle at 34% 76%, #b0663a, transparent 60%),
+    radial-gradient(circle at 50% 50%, #e2793c, #d9743f 52%, #a8451f 100%);
+  /* The stage wash: smoked glass rather than colour. Shades of black lifted by
+     two thin white sheens — one across the top edge, one raking the top-right
+     corner — over a graphite-to-black body, with the bottom corners sunk. Reads
+     as a pane catching the room light, and it never fights the orb's copper.
+     Kept here because both the demo card (home.css) and the hero frame that
+     holds it (marketing.css) paint with it. */
+  --stage-wash:
+    linear-gradient(178deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.014) 16%, transparent 34%),
+    radial-gradient(58% 44% at 96% 2%, rgba(255, 255, 255, 0.05), transparent 56%),
+    radial-gradient(70% 58% at 4% 104%, rgba(0, 0, 0, 0.6), transparent 62%),
+    radial-gradient(64% 54% at 100% 108%, rgba(0, 0, 0, 0.5), transparent 60%),
+    linear-gradient(180deg, rgba(32, 32, 35, 0.62), rgba(14, 14, 16, 0.82) 46%, rgba(7, 7, 8, 0.94));
+  /* Categorical series for model-drawn charts: the deck's pastels, all light
+     against the near-black stage. Hue is never the only channel — every point
+     carries its label and value as text — so a close pair stays readable. */
+  --series-1: #f2c8b4;
+  --series-2: #a9c6e0;
+  --series-3: #f0dfa8;
+  --series-4: #c9b6d8;
+  --series-5: #9fd3c2;
+  --series-6: #e8a0a0;
+  --content: 1100px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  color: inherit;
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  border: 0;
+}
+
+a {
+  color: var(--primary-soft);
+  text-decoration: none;
+}
+
+a,
+button {
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 220ms ease,
+    opacity 180ms ease;
+}
+
+a:active,
+button:active {
+  transform: scale(0.965);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgba(232, 167, 101, 0.34);
+  color: var(--ink);
+}
+
+img,
+svg,
+canvas {
+  display: block;
+}
+
+img {
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p {
+  text-wrap: pretty;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 10000;
+  top: 12px;
+  left: 12px;
+  padding: 10px 15px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #14151a;
+  font-weight: 650;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  /* No opaque fallback layer here (unlike before): body's own background is
+     the true base, so the site-wide particle layer rendered behind it in the
+     root layout can show through wherever a page doesn't otherwise cover it. */
+  background:
+    radial-gradient(80% 32% at 50% 0%, rgba(84, 44, 19, 0.82), transparent 72%),
+    radial-gradient(120% 50% at 50% 115%, rgba(150, 83, 31, 0.28), transparent 62%);
+  animation: page-enter 440ms var(--ease-out) both;
+}
+
+/* The site-wide particle layer, rendered once in the root layout as a direct
+   child of <body>. Fixed behind every page's content. The home hero excludes
+   it (see .fm-hero) since it already renders its own dedicated instance. */
+body > .stage-particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.page--stage::before,
+.page--stage::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: var(--stage-height, clamp(480px, 72vh, 720px));
+  content: '';
+  pointer-events: none;
+}
+
+.page--stage::before {
+  background: url('/hero-stage.webp') center bottom / cover no-repeat;
+}
+
+/* Scrim over the studio plate. Kept light through the middle so the copper
+   field and its horizon band read as the design's backdrop rather than a
+   darkened photo; it only closes down where the page has to hand off to --bg. */
+.page--stage::after {
+  background: linear-gradient(180deg, rgba(11, 7, 5, 0.26), rgba(11, 7, 5, 0.02) 30%, rgba(11, 7, 5, 0.34) 76%, var(--bg) 99%);
+}
+
+.page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  width: min(var(--content), calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.eyebrow {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.gradient-heading {
+  margin: 0;
+  background: linear-gradient(98deg, #fdfaf5 5%, #f3ddc9 35%, #d9a793 60%, #fdfaf5 95%);
+  background-size: 220% 100%;
+  background-clip: text;
+  color: var(--primary-soft);
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 7s ease-in-out infinite alternate;
+}
+
+.glass {
+  border: 1px solid var(--border-bright);
+  background: rgba(9, 6, 4, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
+
+.brand {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: flex-start;
+  gap: 1px;
+  color: #fff;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.brand:hover {
+  color: #fff;
+}
+
+.brand svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.brand__word {
+  margin-left: -3px;
+  font-size: 17px;
+  font-weight: 720;
+  letter-spacing: -0.045em;
+  line-height: 22px;
+}
+
+.brand__ai {
+  margin-top: 1px;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.045em;
+}
+
+.brand__suffix {
+  align-self: center;
+  margin-left: 10px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+  color: var(--text-subtle);
+  font-size: 13px;
+  font-weight: 450;
+  line-height: 20px;
+}
+
+.surface {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-card);
+  background: rgba(8, 5, 3, 0.93);
+}
+
+.spotlight-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.spotlight-card::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(440px circle at var(--spot-x, 50%) var(--spot-y, 0%), rgba(232, 167, 101, 0.11), transparent 64%);
+  content: '';
+  opacity: var(--spot-opacity, 0);
+  transition: opacity 350ms ease;
+  pointer-events: none;
+}
+
+/* Capsules are outlined and unfilled; the selected one is solid white with dark
+   text. Amber stays in the backdrop and the hover glow — it never fills a
+   control in the new direction. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 9px 17px;
+  border: 1px solid var(--border-bright);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pill:hover {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+}
+
+.pill[aria-pressed='true'],
+.pill.is-active {
+  border-color: #fff;
+  background: #fff;
+  color: #14120f;
+  font-weight: 600;
+}
+
+.pill[aria-pressed='true']:hover,
+.pill.is-active:hover {
+  background: #f6e6d8;
+  color: #14120f;
+}
+
+.button-primary,
+.button-secondary,
+.button-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 19px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.button-primary {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: #fff;
+  color: #14151a;
+}
+
+.button-primary:hover {
+  background: #f3ddc9;
+  box-shadow: 0 10px 28px rgba(232, 167, 101, 0.25);
+  color: #14151a;
+  transform: translateY(-1.5px);
+}
+
+/* Kept as the one warm CTA (playground Run, console create-key) so those pages
+   still have a primary distinct from the white button — pulled toward the
+   deck's cream end of the amber ramp. */
+.button-gold {
+  background: linear-gradient(120deg, #f7e2cd, #e8b98a);
+  color: #1a0f06;
+}
+
+.button-gold:hover {
+  background: linear-gradient(120deg, #fff2e4, #f2c99f);
+  box-shadow: 0 10px 26px rgba(232, 167, 101, 0.28);
+  color: #1a0f06;
+  transform: translateY(-1.5px);
+}
+
+.button-secondary {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text);
+}
+
+.button-secondary:hover {
+  border-color: var(--primary-border);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+}
+
+.icon-button {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border-bright);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-subtle);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+}
+
+.mono-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  border: 1px solid var(--primary-border);
+  border-radius: 999px;
+  background: var(--primary-faint);
+  color: var(--primary-soft);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.025em;
+}
+
+.code-block {
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-panel);
+  background: #0b0805;
+}
+
+.code-block__header {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px 7px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #171008;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.code-block__copy {
+  min-height: 30px;
+  padding: 5px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-subtle);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.code-block__copy:hover {
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 17px 18px;
+  overflow-x: auto;
+  color: #e8dcc8;
+  font-size: 12px;
+  line-height: 1.72;
+  tab-size: 2;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 650ms var(--ease-out) var(--reveal-delay, 0ms),
+    transform 650ms var(--ease-out) var(--reveal-delay, 0ms);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dialog-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  overflow-y: auto;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5, 2, 0, 0.72);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  animation: fade-in 180ms ease both;
+}
+
+.dialog-panel {
+  width: min(100%, 480px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-card);
+  background: #0b0805;
+  box-shadow: var(--shadow-stage);
+  animation: dialog-enter 260ms var(--ease-out) both;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.52);
+}
+
+.marketing-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 36px;
+  margin-top: clamp(70px, 10vh, 110px);
+  padding-block: 34px 42px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.marketing-footer__meta {
+  margin-top: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.035em;
+}
+
+.marketing-footer__groups {
+  display: flex;
+  gap: clamp(30px, 6vw, 70px);
+}
+
+.marketing-footer__group {
+  display: flex;
+  min-width: 92px;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 12.5px;
+}
+
+.marketing-footer__group > div {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+}
+
+.marketing-footer__group a {
+  color: var(--text-subtle);
+}
+
+.marketing-footer__group a:hover {
+  color: var(--ink);
+}
+
+.route-loader {
+  position: fixed;
+  z-index: 9000;
+  top: 0;
+  left: 0;
+  width: 36%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), var(--primary-bright));
+  animation: route-loading 900ms ease-in-out infinite;
+}
+
+.error-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+  text-align: center;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialog-enter {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes route-loading {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(390%); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-dot {
+  50% { opacity: 0.3; }
+}
+
+@keyframes caret {
+  50% { opacity: 0; }
+}
+
+@keyframes bar-grow-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes bar-grow-y {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+::view-transition-old(root) {
+  animation: 180ms ease both fade-out-view;
+}
+
+::view-transition-new(root) {
+  animation: 380ms var(--ease-out) both fade-in-view;
+}
+
+@keyframes fade-out-view {
+  to { opacity: 0; transform: scale(0.997); }
+}
+
+@keyframes fade-in-view {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+@media (max-width: 720px) {
+  .container {
+    width: min(100% - 28px, var(--content));
+  }
+
+  .page--stage::before,
+  .page--stage::after {
+    background-position: 48% bottom;
+  }
+
+  .code-block pre {
+    font-size: 11.5px;
+  }
+
+  .marketing-footer {
+    flex-direction: column;
+  }
+
+  .marketing-footer__groups {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .button-primary,
+  .button-secondary,
+  .button-gold {
+    min-height: 44px;
+  }
+
+  .dialog-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .dialog-panel {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+    border-radius: 24px;
+  }
+
+  .marketing-footer__groups {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .dialog-backdrop {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
